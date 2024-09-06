@@ -1,38 +1,13 @@
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-class Customer {
-    private static int idCounter = 1;
-    private int id;
-    private String username;
-    protected String password;
-    private double totalSpent;
-    private ShoppingCart cart;
-    private List<Product> shoppingHistory;
+class Customer extends User {
+    private ShoppingCart cart = new ShoppingCart();
 
     public Customer(String username, String password) {
-        this.id = idCounter++;
-        this.username = username;
-        this.password = password;
-        this.totalSpent = 0;
-        this.cart = new ShoppingCart();
+        super(username, password);
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setPassword(String newPassword) {
-        this.password = newPassword;
-    }
-
-    public double getTotalSpent() {
-        return totalSpent;
+    @Override
+    public boolean login(String username, String password) {
+        return this.username.equals(username) && this.password.equals(password);
     }
 
     public void addToCart(Product product, int quantity) {
@@ -44,30 +19,11 @@ class Customer {
     }
 
     public void checkout() {
-        double total = cart.calculateTotal();
-        System.out.println("Total cost: " + total);
-        totalSpent += total;
-        cart.clear();
-    }
-
-    @Override
-    public String toString() {
-        return "Customer ID: " + id + ", Username: " + username + ", Total Spent: " + totalSpent;
+        System.out.println("Checking out...");
+        cart.checkout();
     }
 
     public void viewShoppingHistory() {
-        if (shoppingHistory.isEmpty()) {
-            System.out.println("Your shopping history is empty.");
-        } else {
-            System.out.println("Shopping History:");
-            for (Product product : shoppingHistory) {
-                System.out.println(product);
-            }
-        }
-    }
-
-    public Object getPassword() {
-        return password;
+        cart.viewHistory();
     }
 }
-

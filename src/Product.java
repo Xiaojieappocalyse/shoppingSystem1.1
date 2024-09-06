@@ -1,5 +1,5 @@
 class Product {
-    private static int idCounter = 1;
+    private static int idCounter = 0;
     private int id;
     private String name;
     private String manufacturer;
@@ -22,28 +22,29 @@ class Product {
         return name;
     }
 
-    public void setName(String newName) {
-        this.name = newName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public double getPrice() {
         return price;
     }
 
-    public void setPrice(double newPrice) {
-        this.price = newPrice;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public int getQuantity() {
         return quantity;
     }
 
-    public void reduceQuantity(int quantity) {
-        this.quantity -= quantity;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     @Override
     public String toString() {
-        return "Product ID: " + id + ", Name: " + name + ", Manufacturer: " + manufacturer + ", Price: " + price + ", Quantity: " + quantity;
+        return "Product [id=" + id + ", name=" + name + ", manufacturer=" + manufacturer + ", price=" + price
+                + ", quantity=" + quantity + "]";
     }
 }
