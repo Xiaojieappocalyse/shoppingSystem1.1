@@ -1,4 +1,3 @@
-// ShoppingSystem.java
 import java.util.Scanner;
 
 public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
@@ -84,17 +83,34 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
         }
     }
 
-    // Modify customer registration to log in automatically and show CustomerMenu
     private static void customerRegistration(Scanner scanner) {
         System.out.println("Enter username:");
         String username = scanner.next();
+
+        // 验证用户名长度不少于5个字符
+        if (!Customer.validateUsername(username)) {
+            System.out.println("Username must be at least 5 characters long.");
+            return;
+        }
+
         System.out.println("Enter password:");
         String password = scanner.next();
-        customers[customerCount] = new Customer(username, password);
+
+        // 验证密码长度和复杂性（大写字母、小写字母、数字和标点符号）
+        if (!Customer.validatePassword(password)) {
+            System.out.println("Password must be at least 9 characters long and include uppercase, lowercase letters, numbers, and symbols.");
+            return;
+        }
+
+        System.out.println("Enter email:");
+        String email = scanner.next();
+
+        // 注册新客户
+        customers[customerCount] = new Customer(username, password, email);
         Customer newCustomer = customers[customerCount++];
         System.out.println("Customer registered successfully!");
 
-        // Automatically log in the newly registered customer
+        // 自动登录新注册的客户
         CustomerMenu customerMenu = new CustomerMenu(scanner, newCustomer, admin, products, productCount);
         customerMenu.displayMenu();
 
@@ -103,7 +119,7 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
             int choice = scanner.nextInt();
             customerMenu.handleChoice(choice);
             if (choice == 5) { // Logout option
-                new ShoppingSystem().returnToMainMenu(); // Return to main menu on logout
+                new ShoppingSystem().returnToMainMenu(); // 返回主菜单
                 break;
             }
         }
@@ -143,3 +159,4 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
         }
     }
 }
+
