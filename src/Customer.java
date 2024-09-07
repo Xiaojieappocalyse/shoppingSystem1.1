@@ -11,7 +11,7 @@ public class Customer extends User {
     private int loginAttempts;
     private boolean isLocked;
 
-    // 构造函数
+    // Constructor
     public Customer(String username, String password, String email) {
         super(username, password);
         this.id = idCounter++;
@@ -23,7 +23,7 @@ public class Customer extends User {
         this.isLocked = false;
     }
 
-    // 注册时的用户名和密码验证
+    // Username and password validation
     public static boolean validateUsername(String username) {
         return username.length() >= 5;
     }
@@ -33,7 +33,7 @@ public class Customer extends User {
         return Pattern.matches(regex, password);
     }
 
-    // 登录方法，加入锁定账户的功能
+    // Login method with account lock functionality
     @Override
     public boolean login(String inputUsername, String inputPassword) {
         if (isLocked) {
@@ -42,13 +42,13 @@ public class Customer extends User {
         }
 
         if (this.username.equals(inputUsername) && this.password.equals(inputPassword)) {
-            loginAttempts = 0; // 成功登录，重置错误次数
+            loginAttempts = 0; // Reset error count on successful login
             System.out.println("Login successful!");
             return true;
         } else {
             loginAttempts++;
             if (loginAttempts >= 5) {
-                isLocked = true; // 错误超过5次，锁定账户
+                isLocked = true; // Lock account after 5 failed attempts
                 System.out.println("Account locked due to multiple incorrect attempts.");
             } else {
                 System.out.println("Incorrect password. Attempts remaining: " + (5 - loginAttempts));
@@ -57,11 +57,9 @@ public class Customer extends User {
         }
     }
 
-    // 修改密码功能
+    // Change password
     public void changePassword(String oldPassword, String newPassword) {
-        // 判断用户输入的旧密码是否正确
         if (this.password.equals(oldPassword)) {
-            // 验证新密码是否符合要求
             if (validatePassword(newPassword)) {
                 this.password = newPassword;
                 System.out.println("Password changed successfully!");
@@ -73,7 +71,7 @@ public class Customer extends User {
         }
     }
 
-    // 忘记密码功能，随机生成新密码并模拟发送邮件
+    // Reset password
     public void resetPassword(String inputUsername, String inputEmail) {
         if (this.username.equals(inputUsername) && this.email.equals(inputEmail)) {
             String newPassword = generateRandomPassword();
@@ -84,7 +82,6 @@ public class Customer extends User {
         }
     }
 
-    // 生成随机密码
     private String generateRandomPassword() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
         StringBuilder newPassword = new StringBuilder();
@@ -96,19 +93,19 @@ public class Customer extends User {
         return newPassword.toString();
     }
 
-    // 添加商品到购物车
+    // Add product to cart
     public void addToCart(Product product, int quantity) {
-        cart.addProduct(product, quantity); // 将商品添加到购物车
+        cart.addProduct(product, quantity);
         System.out.println(quantity + " of " + product.getName() + " added to cart.");
     }
 
-    // 从购物车移除商品
+    // Remove product from cart
     public void removeFromCart(Product product) {
-        cart.removeProduct(product); // 从购物车移除商品
+        cart.removeProduct(product);
         System.out.println(product.getName() + " removed from cart.");
     }
 
-    // 结账功能
+    // Checkout functionality
     public void checkout() {
         double total = cart.calculateTotal();
         if (total == 0) {
@@ -119,7 +116,7 @@ public class Customer extends User {
         System.out.println("Total cost: " + total);
         System.out.println("Select payment method: 1. Alipay 2. WeChat 3. Bank Card");
         Scanner scanner = new Scanner(System.in);
-        int paymentMethod = scanner.nextInt(); // 模拟选择支付方式
+        int paymentMethod = scanner.nextInt();
 
         switch (paymentMethod) {
             case 1:
@@ -136,37 +133,45 @@ public class Customer extends User {
                 return;
         }
 
-        // 支付成功，扣减库存
         for (Map.Entry<Product, Integer> entry : cart.getProducts().entrySet()) {
             Product product = entry.getKey();
             int quantity = entry.getValue();
-            product.setQuantity(product.getQuantity() - quantity); // 扣减库存
+            product.setQuantity(product.getQuantity() - quantity); // Deduct stock
+            shoppingHistory.add(product);  // Add to shopping history
         }
 
-        totalSpent += total; // 更新总消费
-        cart.clear(); // 清空购物车
-        System.out.println("Checkout completed.");
+        totalSpent += total; // Update total spent
+        cart.clearCart();    // Clear cart
+        System.out.println("Checkout complete. Thank you for your purchase!");
     }
 
-    // 获取总消费
-    public double getTotalSpent() {
-        return totalSpent;
-    }
-
-    // 查看购物历史
+    // View shopping history
     public void viewShoppingHistory() {
         if (shoppingHistory.isEmpty()) {
             System.out.println("Your shopping history is empty.");
         } else {
-            System.out.println("Shopping History:");
+            System.out.println("Your shopping history:");
             for (Product product : shoppingHistory) {
-                System.out.println(product);
+                System.out.println(product.getName() + " (Price: " + product.getPrice() + ")");
             }
         }
     }
 
-    @Override
-    public String toString() {
-        return "Customer ID: " + id + ", Username: " + username + ", Total Spent: " + totalSpent;
+    // Get customer's shopping history
+    public List<Product> getShoppingHistory() {
+        return shoppingHistory;
+    }
+
+    // Getter for password
+    public String getPassword() {
+        return this.password;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

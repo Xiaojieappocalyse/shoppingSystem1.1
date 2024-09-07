@@ -1,21 +1,17 @@
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
-// AdminMenu.java
 public class AdminMenu extends Menu {
     private Admin admin;
-    private Product[] products;
-    private Customer[] customers;
-    private int productCount;
-    private int customerCount;
+    private List<Product> products;
+    private List<Customer> customers;
 
-    public AdminMenu(Scanner scanner, Admin admin, Product[] products, Customer[] customers, int productCount, int customerCount) {
+    public AdminMenu(Scanner scanner, Admin admin, List<Product> products, List<Customer> customers) {
         super(scanner);
         this.admin = admin;
         this.products = products;
         this.customers = customers;
-        this.productCount = productCount;
-        this.customerCount = customerCount;
     }
 
     @Override
@@ -41,7 +37,7 @@ public class AdminMenu extends Menu {
                 resetCustomerPassword();
                 break;
             case 3:
-                admin.listAllCustomers(customers, customerCount);
+                admin.listAllCustomers(customers);
                 break;
             case 4:
                 addProduct();
@@ -53,7 +49,7 @@ public class AdminMenu extends Menu {
                 deleteProduct();
                 break;
             case 7:
-                admin.listAllProducts(products, productCount);
+                admin.listAllProducts(products);
                 break;
             case 8:
                 System.out.println("Logging out...");
@@ -72,7 +68,7 @@ public class AdminMenu extends Menu {
     private void resetCustomerPassword() {
         System.out.println("Enter customer ID to reset password:");
         int customerId = scanner.nextInt();
-        Customer customer = admin.findCustomerById(customerId, customers, customerCount);
+        Customer customer = admin.findCustomerById(customerId, customers);
         if (customer != null) {
             System.out.println("Enter new password for customer:");
             String newPassword = scanner.next();
@@ -115,13 +111,13 @@ public class AdminMenu extends Menu {
         }
 
         Product product = new Product(name, manufacturer, price, quantity);
-        admin.addProduct(products, product, productCount++);
+        admin.addProduct(products, product);
     }
 
     private void modifyProduct() {
         System.out.println("Enter product ID to modify:");
         int productId = scanner.nextInt();
-        Product product = admin.findProductById(productId, products, productCount);
+        Product product = admin.findProductById(productId, products);
         if (product != null) {
             System.out.println("Enter new product name:");
             String newName = scanner.next();
@@ -138,7 +134,6 @@ public class AdminMenu extends Menu {
     private void deleteProduct() {
         System.out.println("Enter product ID to delete:");
         int productId = scanner.nextInt();
-        admin.deleteProduct(products, productId, productCount);
+        admin.deleteProduct(products, productId);
     }
 }
-

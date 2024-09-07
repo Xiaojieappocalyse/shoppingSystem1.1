@@ -1,18 +1,16 @@
-import java.util.Scanner;
 import java.util.List;
+import java.util.Scanner;
 
 public class CustomerMenu extends Menu {
     private Customer customer;
     private Admin admin;
-    private Product[] products;
-    private int productCount;
+    private List<Product> products;
 
-    public CustomerMenu(Scanner scanner, Customer customer, Admin admin, Product[] products, int productCount) {
+    public CustomerMenu(Scanner scanner, Customer customer, Admin admin, List<Product> products) {
         super(scanner);
         this.customer = customer;
         this.admin = admin;
         this.products = products;
-        this.productCount = productCount;
     }
 
     @Override
@@ -56,11 +54,10 @@ public class CustomerMenu extends Menu {
         }
     }
 
-    // 添加商品到购物车
     private void addProductToCart() {
         System.out.println("Enter product ID to add to cart:");
         int productId = scanner.nextInt();
-        Product product = admin.findProductById(productId, products, productCount);
+        Product product = admin.findProductById(productId, products);
         if (product != null) {
             System.out.println("Enter quantity:");
             int quantity = scanner.nextInt();
@@ -71,11 +68,10 @@ public class CustomerMenu extends Menu {
         }
     }
 
-    // 从购物车移除商品
     private void removeProductFromCart() {
         System.out.println("Enter product ID to remove from cart:");
         int productId = scanner.nextInt();
-        Product product = admin.findProductById(productId, products, productCount);
+        Product product = admin.findProductById(productId, products);
         if (product != null) {
             customer.removeFromCart(product);
             System.out.println("Product removed from cart.");
@@ -84,7 +80,6 @@ public class CustomerMenu extends Menu {
         }
     }
 
-    // 修改密码
     private void changePassword() {
         System.out.println("Enter old password:");
         String oldPassword = scanner.next();
@@ -93,7 +88,6 @@ public class CustomerMenu extends Menu {
         customer.changePassword(oldPassword, newPassword);
     }
 
-    // 忘记密码
     private void forgotPassword() {
         System.out.println("Enter your username:");
         String username = scanner.next();

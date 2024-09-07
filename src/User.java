@@ -20,4 +20,5 @@ abstract class User {
         this.password = newPassword;
         System.out.println("Password changed successfully!");
     }
+
 }

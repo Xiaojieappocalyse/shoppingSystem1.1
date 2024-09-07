@@ -1,11 +1,10 @@
-import java.util.Scanner;
+import java.util.*;
 
-public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
+public class ShoppingSystem implements Navigable {
     private static Admin admin = new Admin();
-    private static Customer[] customers = new Customer[100];
-    private static Product[] products = new Product[100];
-    private static int customerCount = 0;
-    private static int productCount = 0;
+    private static List<Customer> customers = new ArrayList<>(); // 使用List替代数组
+    private static List<Product> products = new ArrayList<>();
+    // 使用List替代数组
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -13,6 +12,16 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
     }
 
     public static void showMainMenu(Scanner scanner) {
+        Product product1 = new Product("Laptop", "Dell", 999.99, 10);
+        Product product2 = new Product("Smartphone", "Apple", 799.99, 20);
+        Product product3 = new Product("Headphones", "Sony", 199.99, 30);
+
+        // 将产品添加到一个列表中
+        List<Product> products = new ArrayList<>();
+        products.add(product1);
+        products.add(product2);
+        products.add(product3);
+
         while (true) {
             System.out.println("\nWelcome to the Shopping Management System");
             System.out.println("1. Admin Login");
@@ -23,9 +32,9 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
             int choice = -1;
             try {
                 choice = scanner.nextInt();
-            } catch (Exception e) {
+            } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter a valid option.");
-                scanner.next();
+                scanner.next(); // 清理错误输入
                 continue;
             }
 
@@ -42,6 +51,7 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
                 case 4:
                     System.out.println("Exiting system. Goodbye!");
                     scanner.close();
+                    System.exit(0);
                     return;
                 default:
                     System.out.println("Invalid choice. Please try again.");
@@ -49,7 +59,6 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
         }
     }
 
-    // Implement Navigable method to return to main menu
     @Override
     public void returnToMainMenu() {
         System.out.println("Returning to main menu...");
@@ -57,7 +66,6 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
         showMainMenu(scanner);
     }
 
-    // Admin login logic remains the same
     private static void adminLogin(Scanner scanner) {
         System.out.println("\nEnter admin username:");
         String username = scanner.next();
@@ -66,7 +74,7 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
 
         if (admin.login(username, password)) {
             System.out.println("Admin logged in successfully!");
-            AdminMenu adminMenu = new AdminMenu(scanner, admin, products, customers, productCount, customerCount);
+            AdminMenu adminMenu = new AdminMenu(scanner, admin, products, customers);
             adminMenu.displayMenu();
 
             while (true) {
@@ -74,7 +82,7 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
                 int choice = scanner.nextInt();
                 adminMenu.handleChoice(choice);
                 if (choice == 8) { // Logout option
-                    new ShoppingSystem().returnToMainMenu(); // Return to main menu on logout
+                    new ShoppingSystem().returnToMainMenu();
                     break;
                 }
             }
@@ -87,7 +95,6 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
         System.out.println("Enter username:");
         String username = scanner.next();
 
-        // 验证用户名长度不少于5个字符
         if (!Customer.validateUsername(username)) {
             System.out.println("Username must be at least 5 characters long.");
             return;
@@ -96,7 +103,6 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
         System.out.println("Enter password:");
         String password = scanner.next();
 
-        // 验证密码长度和复杂性（大写字母、小写字母、数字和标点符号）
         if (!Customer.validatePassword(password)) {
             System.out.println("Password must be at least 9 characters long and include uppercase, lowercase letters, numbers, and symbols.");
             return;
@@ -105,13 +111,12 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
         System.out.println("Enter email:");
         String email = scanner.next();
 
-        // 注册新客户
-        customers[customerCount] = new Customer(username, password, email);
-        Customer newCustomer = customers[customerCount++];
+        // 注册新客户并自动登录
+        Customer newCustomer = new Customer(username, password, email);
+        customers.add(newCustomer);
         System.out.println("Customer registered successfully!");
 
-        // 自动登录新注册的客户
-        CustomerMenu customerMenu = new CustomerMenu(scanner, newCustomer, admin, products, productCount);
+        CustomerMenu customerMenu = new CustomerMenu(scanner, newCustomer, admin, products);
         customerMenu.displayMenu();
 
         while (true) {
@@ -119,13 +124,12 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
             int choice = scanner.nextInt();
             customerMenu.handleChoice(choice);
             if (choice == 5) { // Logout option
-                new ShoppingSystem().returnToMainMenu(); // 返回主菜单
+                new ShoppingSystem().returnToMainMenu();
                 break;
             }
         }
     }
 
-    // Customer login logic remains the same
     private static void customerLogin(Scanner scanner) {
         System.out.println("Enter username:");
         String username = scanner.next();
@@ -133,16 +137,16 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
         String password = scanner.next();
 
         Customer customer = null;
-        for (int i = 0; i < customerCount; i++) {
-            if (customers[i].login(username, password)) {
-                customer = customers[i];
+        for (Customer cust : customers) {
+            if (cust.login(username, password)) {
+                customer = cust;
                 break;
             }
         }
 
         if (customer != null) {
             System.out.println("Customer logged in successfully!");
-            CustomerMenu customerMenu = new CustomerMenu(scanner, customer, admin, products, productCount);
+            CustomerMenu customerMenu = new CustomerMenu(scanner, customer, admin, products);
             customerMenu.displayMenu();
 
             while (true) {
@@ -150,7 +154,7 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
                 int choice = scanner.nextInt();
                 customerMenu.handleChoice(choice);
                 if (choice == 5) { // Logout option
-                    new ShoppingSystem().returnToMainMenu(); // Return to main menu on logout
+                    new ShoppingSystem().returnToMainMenu();
                     break;
                 }
             }
@@ -159,4 +163,3 @@ public class ShoppingSystem implements Navigable { // 实现 Navigable 接口
         }
     }
 }
-

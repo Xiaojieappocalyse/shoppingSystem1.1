@@ -1,4 +1,4 @@
-class Product {
+public class Product {
     private static int idCounter = 0;
     private int id;
     private String name;
@@ -42,9 +42,26 @@ class Product {
         this.quantity = quantity;
     }
 
+    public String getManufacturer() {
+        return manufacturer; // Added getter for manufacturer
+    }
+
     @Override
     public String toString() {
         return "Product [id=" + id + ", name=" + name + ", manufacturer=" + manufacturer + ", price=" + price
                 + ", quantity=" + quantity + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return id == product.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
     }
 }

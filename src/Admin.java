@@ -1,4 +1,6 @@
-class Admin extends User {
+import java.util.List;
+
+public class Admin extends User {
 
     public Admin() {
         super("admin", "ynuinfo#777"); // 默认管理员账户
@@ -9,11 +11,14 @@ class Admin extends User {
         return this.username.equals(username) && this.password.equals(password);
     }
 
-    public void addProduct(Product[] products, Product product, int productCount) {
-        products[productCount] = product;
+
+    // Add a product to the list
+    public void addProduct(List<Product> products, Product product) {
+        products.add(product);
         System.out.println("Product added successfully!");
     }
 
+    // Modify an existing product
     public void modifyProduct(Product product, String newName, double newPrice, int newQuantity) {
         product.setName(newName);
         product.setPrice(newPrice);
@@ -21,47 +26,55 @@ class Admin extends User {
         System.out.println("Product modified successfully!");
     }
 
-    public void deleteProduct(Product[] products, int productId, int productCount) {
-        for (int i = 0; i < productCount; i++) {
-            if (products[i].getId() == productId) {
-                products[i] = products[productCount - 1]; // 用最后一个产品覆盖要删除的产品
-                products[productCount - 1] = null;
-                System.out.println("Product deleted successfully!");
-                return;
-            }
+    // Delete a product by ID
+    public void deleteProduct(List<Product> products, int productId) {
+        Product product = findProductById(productId, products);
+        if (product != null) {
+            products.remove(product);
+            System.out.println("Product deleted successfully!");
+        } else {
+            System.out.println("Product not found.");
         }
-        System.out.println("Product not found.");
     }
 
-    public void listAllCustomers(Customer[] customers, int customerCount) {
+    // List all customers
+    public void listAllCustomers(List<Customer> customers) {
         System.out.println("Listing all customers:");
-        for (int i = 0; i < customerCount; i++) {
-            System.out.println("Customer ID: " + i + ", Username: " + customers[i].getUsername());
+        for (Customer customer : customers) {
+            System.out.println("Customer ID: " + customer.getId() + ", Username: " + customer.getUsername() + ", Email: " + customer.getEmail());
         }
     }
 
-    public void listAllProducts(Product[] products, int productCount) {
+    // List all products
+    public void listAllProducts(List<Product> products) {
         System.out.println("Listing all products:");
-        for (int i = 0; i < productCount; i++) {
-            System.out.println(products[i]);
+        for (Product product : products) {
+            System.out.println("Product ID: " + product.getId() + ", Name: " + product.getName() + ", Manufacturer: " + product.getManufacturer() + ", Price: " + product.getPrice() + ", Quantity: " + product.getQuantity());
         }
     }
 
-    public Customer findCustomerById(int id, Customer[] customers, int customerCount) {
-        if (id >= 0 && id < customerCount) {
-            return customers[id];
+    // Find customer by ID
+    public Customer findCustomerById(int id, List<Customer> customers) {
+        for (Customer customer : customers) {
+            if (customer.getId() == id) {
+                return customer;
+            }
         }
         return null;
     }
 
+    // Reset customer password
     public void resetCustomerPassword(Customer customer, String newPassword) {
-        customer.changePassword(newPassword);
+        customer.changePassword(customer.getPassword(), newPassword);
         System.out.println("Customer password reset successfully!");
     }
 
-    public Product findProductById(int id, Product[] products, int productCount) {
-        if (id >= 0 && id < productCount) {
-            return products[id];
+    // Find product by ID
+    public Product findProductById(int id, List<Product> products) {
+        for (Product product : products) {
+            if (product.getId() == id) {
+                return product;
+            }
         }
         return null;
     }
