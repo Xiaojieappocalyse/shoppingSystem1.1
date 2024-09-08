@@ -1,10 +1,12 @@
 import java.util.List;
 import java.util.Scanner;
+import java.util.InputMismatchException;
 
 public class CustomerMenu extends Menu {
     private Customer customer;
     private Admin admin;
     private List<Product> products;
+    private boolean returnToMainMenu;
 
     public CustomerMenu(Scanner scanner, Customer customer, Admin admin, List<Product> products) {
         super(scanner);
@@ -48,6 +50,7 @@ public class CustomerMenu extends Menu {
                 break;
             case 7:
                 System.out.println("Logging out...");
+                returnToMainMenu = true; // Set flag to return to main menu
                 return;
             default:
                 System.out.println("Invalid choice. Please try again.");
@@ -55,44 +58,63 @@ public class CustomerMenu extends Menu {
     }
 
     private void addProductToCart() {
-        System.out.println("Enter product ID to add to cart:");
-        int productId = scanner.nextInt();
-        Product product = admin.findProductById(productId, products);
+        System.out.println("Enter the product ID to add to cart:");
+        int productId = getInputInt();
+        Product product = findProductById(productId);
+
         if (product != null) {
-            System.out.println("Enter quantity:");
-            int quantity = scanner.nextInt();
+            System.out.println("Enter the quantity to add:");
+            int quantity = getInputInt();
             customer.addToCart(product, quantity);
-            System.out.println("Product added to cart.");
         } else {
             System.out.println("Product not found.");
         }
     }
 
     private void removeProductFromCart() {
-        System.out.println("Enter product ID to remove from cart:");
-        int productId = scanner.nextInt();
-        Product product = admin.findProductById(productId, products);
+        System.out.println("Enter the product ID to remove from cart:");
+        int productId = getInputInt();
+        Product product = findProductById(productId);
+
         if (product != null) {
             customer.removeFromCart(product);
-            System.out.println("Product removed from cart.");
         } else {
             System.out.println("Product not found.");
         }
     }
 
     private void changePassword() {
-        System.out.println("Enter old password:");
-        String oldPassword = scanner.next();
-        System.out.println("Enter new password:");
-        String newPassword = scanner.next();
-        customer.changePassword(oldPassword, newPassword);
+        System.out.println("Enter your current password:");
+        String currentPassword = scanner.nextLine();
+        System.out.println("Enter your new password:");
+        String newPassword = scanner.nextLine();
+        customer.changePassword(currentPassword, newPassword);
     }
 
     private void forgotPassword() {
         System.out.println("Enter your username:");
-        String username = scanner.next();
-        System.out.println("Enter your registered email:");
-        String email = scanner.next();
+        String username = scanner.nextLine();
+        System.out.println("Enter your email:");
+        String email = scanner.nextLine();
         customer.resetPassword(username, email);
+    }
+
+    private Product findProductById(int productId) {
+        for (Product product : products) {
+            if (product.getId() == productId) {
+                return product;
+            }
+        }
+        return null;
+    }
+
+    private int getInputInt() {
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number:");
+            }
+        }
     }
 }

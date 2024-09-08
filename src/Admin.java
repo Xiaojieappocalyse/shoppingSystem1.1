@@ -3,14 +3,13 @@ import java.util.List;
 public class Admin extends User {
 
     public Admin() {
-        super("admin", "ynuinfo#777"); // 默认管理员账户
+        super("admin", "ynuinfo#777"); // Default admin account
     }
 
     @Override
     public boolean login(String username, String password) {
         return this.username.equals(username) && this.password.equals(password);
     }
-
 
     // Add a product to the list
     public void addProduct(List<Product> products, Product product) {
@@ -65,7 +64,7 @@ public class Admin extends User {
 
     // Reset customer password
     public void resetCustomerPassword(Customer customer, String newPassword) {
-        customer.changePassword(customer.getPassword(), newPassword);
+        customer.changePassword(customer.getPassword(), newPassword); // Using getPassword() to retrieve old password
         System.out.println("Customer password reset successfully!");
     }
 

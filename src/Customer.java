@@ -23,11 +23,12 @@ public class Customer extends User {
         this.isLocked = false;
     }
 
-    // Username and password validation
+    // Username validation
     public static boolean validateUsername(String username) {
         return username.length() >= 5;
     }
 
+    // Password validation
     public static boolean validatePassword(String password) {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W]).{9,}$";
         return Pattern.matches(regex, password);
@@ -82,12 +83,13 @@ public class Customer extends User {
         }
     }
 
+    // Generate a random password
     private String generateRandomPassword() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
         StringBuilder newPassword = new StringBuilder();
         Random rnd = new Random();
         while (newPassword.length() < 10) {
-            int index = (int) (rnd.nextFloat() * chars.length());
+            int index = rnd.nextInt(chars.length());
             newPassword.append(chars.charAt(index));
         }
         return newPassword.toString();
@@ -116,7 +118,13 @@ public class Customer extends User {
         System.out.println("Total cost: " + total);
         System.out.println("Select payment method: 1. Alipay 2. WeChat 3. Bank Card");
         Scanner scanner = new Scanner(System.in);
-        int paymentMethod = scanner.nextInt();
+        int paymentMethod = -1;
+        try {
+            paymentMethod = scanner.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a number between 1 and 3.");
+            return;
+        }
 
         switch (paymentMethod) {
             case 1:
@@ -157,21 +165,26 @@ public class Customer extends User {
         }
     }
 
-    // Get customer's shopping history
-    public List<Product> getShoppingHistory() {
-        return shoppingHistory;
+    // Getters and Setters
+    public String getEmail() {
+        return email;
     }
 
-    // Getter for password
-    public String getPassword() {
-        return this.password;
+    public void setPassword(String newPassword) {
+        if (validatePassword(newPassword)) {
+            this.password = newPassword;
+            System.out.println("Password has been updated successfully.");
+        } else {
+            System.out.println("New password does not meet the requirements.");
+        }
     }
 
     public int getId() {
         return id;
     }
 
-    public String getEmail() {
-        return email;
+    // Getter for password (consider security implications)
+    public String getPassword() {
+        return password;
     }
 }
