@@ -1,34 +1,39 @@
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.InputMismatchException;
 
 public class ShoppingSystem implements Navigable {
+
     private static Admin admin = new Admin();
     private static List<Customer> customers = new ArrayList<>();
     private static List<Product> products = new ArrayList<>();
 
     public static void main(String[] args) {
+        // Load data from files
+        try {
+            customers = DataManager.loadUsers();
+            products = DataManager.loadProducts();
+        } catch (IOException e) {
+            System.out.println("Error loading data: " + e.getMessage());
+        }
+
         Scanner scanner = new Scanner(System.in);
-
-        // Initialize some products
-        Product product1 = new Product("Laptop", "Dell", 999.99, 10);
-        Product product2 = new Product("Smartphone", "Apple", 799.99, 20);
-        Product product3 = new Product("Headphones", "Sony", 199.99, 30);
-
-        products.add(product1);
-        products.add(product2);
-        products.add(product3);
-
-        // Add initial customers
-        Customer customer1 = new Customer("johnDoe", "Password123!", "john@gmail.com");
-        Customer customer2 = new Customer("janeSmith", "SecurePass456$", "jane@example.com");
-        Customer customer3 = new Customer("bobBrown", "MyPassword789@", "bob@example.com");
-
-        customers.add(customer1);
-        customers.add(customer2);
-        customers.add(customer3);
 
         // Show main menu
         showMainMenu(scanner);
+
+        // Save data to files on exit
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                DataManager.saveUsers(customers);
+                DataManager.saveProducts(products);
+                // Optionally, save shopping history if it is being tracked
+                // DataManager.saveShoppingHistory(getShoppingHistory());
+            } catch (IOException e) {
+                System.out.println("Error saving data: " + e.getMessage());
+            }
+        }));
     }
 
     public static void showMainMenu(Scanner scanner) {
@@ -121,7 +126,7 @@ public class ShoppingSystem implements Navigable {
         String email = scanner.next();
 
         // Register new customer and automatically log in
-        Customer newCustomer = new Customer(username, password, email);
+        Customer newCustomer = new Customer(username, encryptPassword(password), email);
         customers.add(newCustomer);
         System.out.println("Customer registered successfully!");
 
@@ -151,7 +156,7 @@ public class ShoppingSystem implements Navigable {
 
         // Iterate through customers list to find matching customer
         for (Customer cust : customers) {
-            if (cust.login(username, password)) {
+            if (cust.getUsername().equals(username) && cust.getPassword().equals(encryptPassword(password))) {
                 customer = cust;
                 break;
             }
@@ -199,10 +204,24 @@ public class ShoppingSystem implements Navigable {
                 System.out.println("Password must be at least 9 characters long and include uppercase, lowercase letters, numbers, and symbols.");
                 return;
             }
-            customer.setPassword(newPassword);
+            customer.setPassword(encryptPassword(newPassword));
             System.out.println("Password updated successfully!");
         } else {
             System.out.println("No account associated with this email.");
+        }
+    }
+
+    private static String encryptPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(password.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : messageDigest) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -211,5 +230,10 @@ public class ShoppingSystem implements Navigable {
         System.out.println("Returning to main menu...");
         Scanner scanner = new Scanner(System.in);
         showMainMenu(scanner);
+    }
+
+    // If shopping history needs to be saved or managed
+    private static List<Product> getShoppingHistory() {
+        return new ArrayList<>();
     }
 }

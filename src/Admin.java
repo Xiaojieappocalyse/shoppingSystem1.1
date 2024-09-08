@@ -1,14 +1,80 @@
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 public class Admin extends User {
 
+    private static final String USER_FILE = "E:\\test\\shoppingsystem1.1\\src\\users.txt";
+
+    // Constructor for default admin account
     public Admin() {
         super("admin", "ynuinfo#777"); // Default admin account
+        saveAdmin(); // Ensure the default admin is saved to the file
+    }
+
+    // Constructor for custom admin account
+    public Admin(String username, String password) {
+        super(username, password);
+        saveAdmin(); // Save admin details when creating a new admin
     }
 
     @Override
     public boolean login(String username, String password) {
-        return this.username.equals(username) && this.password.equals(password);
+        return this.username.equals(username) && this.password.equals(hashPassword(password));
+    }
+
+    // Save admin to file
+    private void saveAdmin() {
+        List<User> users = loadUsers();
+        boolean adminExists = false;
+        for (User user : users) {
+            if (user instanceof Admin) {
+                adminExists = true;
+                break;
+            }
+        }
+        if (!adminExists) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(USER_FILE, true))) {
+                writer.write(this.getId() + "," + this.getUsername() + "," + this.getEmail() + "," + this.getPassword() + ",admin");
+                writer.newLine();
+            } catch (IOException e) {
+                System.out.println("Error saving admin information: " + e.getMessage());
+            }
+        }
+    }
+
+    // Load users from file
+    private List<User> loadUsers() {
+        List<User> users = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(USER_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts[4].equals("admin")) {
+                    Admin admin = new Admin(parts[1], parts[3]);
+                    admin.setId(Integer.parseInt(parts[0]));
+                    admin.setEmail(parts[2]);
+                    users.add(admin);
+                } else {
+                    Customer customer = new Customer(parts[1], parts[3], parts[2]);
+                    customer.setId(Integer.parseInt(parts[0]));
+                    users.add(customer);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading user information: " + e.getMessage());
+        }
+        return users;
+    }
+
+    // Implementing abstract methods from User class
+    @Override
+    protected void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    protected void setEmail(String email) {
+        this.email = email;
     }
 
     // Add a product to the list
@@ -64,7 +130,7 @@ public class Admin extends User {
 
     // Reset customer password
     public void resetCustomerPassword(Customer customer, String newPassword) {
-        customer.changePassword(customer.getPassword(), newPassword); // Using getPassword() to retrieve old password
+        customer.setPassword(hashPassword(newPassword)); // Using setPassword() to set new password
         System.out.println("Customer password reset successfully!");
     }
 

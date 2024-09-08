@@ -1,5 +1,5 @@
 public class Product {
-    private static int idCounter = 0;
+    private static int idCounter = 1;  // Start with 1 to avoid id 0 which might be confusing
     private int id;
     private String name;
     private String manufacturer;
@@ -14,6 +14,16 @@ public class Product {
         this.quantity = quantity;
     }
 
+    // Constructor for loading from data
+    public Product(int id, String name, String manufacturer, double price, int quantity) {
+        this.id = id;
+        this.name = name;
+        this.manufacturer = manufacturer;
+        this.price = price;
+        this.quantity = quantity;
+    }
+
+    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -43,7 +53,11 @@ public class Product {
     }
 
     public String getManufacturer() {
-        return manufacturer; // Added getter for manufacturer
+        return manufacturer;
+    }
+
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
     }
 
     @Override

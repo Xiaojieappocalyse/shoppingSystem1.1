@@ -60,9 +60,11 @@ public class AdminMenu extends Menu {
     }
 
     private void changeAdminPassword() {
+        System.out.println("Enter current password for admin:");
+        String oldPassword = scanner.next();
         System.out.println("Enter new password for admin:");
         String newPassword = scanner.next();
-        admin.changePassword(newPassword);
+        admin.changePassword(oldPassword, newPassword);
     }
 
     private void resetCustomerPassword() {
